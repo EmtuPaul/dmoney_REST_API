@@ -1,0 +1,522 @@
+{
+	"info": {
+		"_postman_id": "763a085d-ce69-4491-9742-fcade4bd740b",
+		"name": "dmoney-REST-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42771747",
+		"_collection_link": "https://bold-eclipse-684578.postman.co/workspace/My-Workspace~377a26d4-24d6-404d-8e12-0db3b587854a/collection/42771747-763a085d-ce69-4491-9742-fcade4bd740b?action=share&source=collection_link&creator=42771747"
+	},
+	"item": [
+		{
+			"name": "Admin Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonResponse=pm.response.json();\r",
+							"pm.collectionVariables.set(\"token\",jsonResponse.token)\r",
+							"\r",
+							"pm.test(\"verify user login is successful\",function(){\r",
+							"pm.expect(jsonResponse.message).contains(\"Login successful\")\r",
+							"    \r",
+							"})\r",
+							"pm.test(\"Status code is 200\",function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n  \"email\": \"admin@roadtocareer.net\",\r\n  \"password\": \"1234\",\r\n  \"role\": \"Admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User List",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/user/list?limit=5",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"list"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search User",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/user/search/id/{{customerId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"search",
+						"id",
+						"{{customerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create an Agent",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonResponse=pm.response.json();\r",
+							"const agentId=jsonResponse.user.id\r",
+							"pm.collectionVariables.set(\"agentId\",agentId)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash=require('lodash')\r",
+							"const prefix=\"0120\"\r",
+							"const randomNumber=lodash.random(1000000,9999999)\r",
+							"const agentPhoneNumber=prefix+randomNumber;\r",
+							"pm.collectionVariables.set(\"agentPhoneNumber\",agentPhoneNumber)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "ROADTOSDET",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n{\r\n  \"name\": \"Agent One\",\r\n  \"email\": \"{{$randomEmail}}\",\r\n  \"password\": \"1234\",\r\n \"phone_number\": \"{{agentPhoneNumber}}\",\r\n  \"nid\": \"123654789\",\r\n  \"role\": \"Agent\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Customer 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonResponse = pm.response.json();\r",
+							"const customer1Id=jsonResponse.user.id\r",
+							"pm.collectionVariables.set(\"customer1Id\",customer1Id)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"const lodash=require('lodash') \r",
+							"const prefix1 = \"017\"; \r",
+							"const randomNumber1 = lodash.random(10000000, 99999999); \r",
+							"const customer1PhoneNumber = prefix1 + randomNumber1;\r",
+							"pm.collectionVariables.set(\"customer1PhoneNumber\", customer1PhoneNumber);\r",
+							"pm.environment.set(\"customer1PhoneNumber\", customer1PhoneNumber);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "ROADTOSDET",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{$randomFullName}}\",\r\n  \"email\": \"{{$randomEmail}}\",\r\n  \"password\": \"1234\",\r\n  \"phone_number\": \"{{customer1PhoneNumber}}\",\r\n  \"nid\": \"123456789\",\r\n  \"role\": \"Customer\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create customer 2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash=require('lodash') \r",
+							"const prefix1 = \"017\"; \r",
+							"const randomNumber1 = lodash.random(10000000, 99999999); \r",
+							"const customer2PhoneNumber = prefix1 + randomNumber1;\r",
+							"pm.collectionVariables.set(\"customer2PhoneNumber\", customer2PhoneNumber);\r",
+							"pm.environment.set(\"customer2PhoneNumber\", customer2PhoneNumber);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonResponse = pm.response.json();\r",
+							"const customer2Id=jsonResponse.user.id\r",
+							"pm.collectionVariables.set(\"customer2Id\",customer2Id)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "ROADTOSDET",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{$randomFullName}}\",\r\n  \"email\": \"{{$randomEmail}}\",\r\n  \"password\": \"1234\",\r\n  \"phone_number\": \"{{customer2PhoneNumber}}\",\r\n  \"nid\": \"987654321\",\r\n  \"role\": \"Customer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Merchant",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash=require('lodash') \r",
+							"const prefix1 = \"017\"; \r",
+							"const randomNumber1 = lodash.random(10000000, 99999999); \r",
+							"const merchantPhoneNumber = prefix1 + randomNumber1;\r",
+							"pm.collectionVariables.set(\"merchantPhoneNumber\", merchantPhoneNumber);\r",
+							"pm.environment.set(\"merchantPhoneNumber\", merchantPhoneNumber);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonResponse = pm.response.json();\r",
+							"const merchantId=jsonResponse.user.id\r",
+							"pm.collectionVariables.set(\"merchantId\",merchantId)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "ROADTOSDET",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{$randomFullName}}\",\r\n  \"email\": \"{{$randomEmail}}\",\r\n  \"password\": \"1234\",\r\n  \"phone_number\": \"{{merchantPhoneNumber}}\",\r\n  \"nid\": \"987654321\",\r\n  \"role\": \"Merchant\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "ROADTOSDET",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Alexiis Heathcote\",\r\n  \"email\": \"Jade26@gmail.com\",\r\n  \"password\": \"1000\",\r\n  \"phone_number\": \"01772847222\",\r\n    \"nid\": \"123456789\",\r\n    \"role\": \"Customer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/update/{{customer1Id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"update",
+						"{{customer1Id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "X-AUTH-SECRET-KEY",
+						"value": "ROADTOSDET",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/user/delete/{{customer1Id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"delete",
+						"{{customer1Id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiYWRtaW5Acm9hZHRvY2FyZWVyLm5ldCIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc0MTMzNDczOCwiZXhwIjoxNzQxMzM4MzM4fQ.AYyiHNkbTB9wJVlGPnHqEKhL18CpgBkPB8VN6yEPts0",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl",
+			"value": "http://dmoney.roadtocareer.net",
+			"type": "string"
+		},
+		{
+			"key": "agentId",
+			"value": 69329
+		},
+		{
+			"key": "agentPhoneNumber",
+			"value": "01203007071"
+		},
+		{
+			"key": "customer1Id",
+			"value": 69330,
+			"type": "string"
+		},
+		{
+			"key": "customer1PhoneNumber",
+			"value": "01751552666"
+		},
+		{
+			"key": "customer2PhoneNumber",
+			"value": "01791643786"
+		},
+		{
+			"key": "customer2Id",
+			"value": 69331
+		},
+		{
+			"key": "merchantPhoneNumber",
+			"value": "01792441340"
+		},
+		{
+			"key": "merchantId",
+			"value": 69332
+		}
+	]
+}
